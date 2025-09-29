@@ -1,0 +1,67 @@
+<div class="app">
+  <header class="header">
+    <h1>🌤️ {{ title }}</h1>
+    <p>Previsão do tempo a qualquer momento!</p>
+  </header>
+
+  <main>
+    <!-- Campo de buscaa -->
+    <div class="search">
+      <input 
+        [(ngModel)]="cityName" 
+        (keypress)="onKeyPress($event)"
+        placeholder="Digite o nome da cidade"
+        [disabled]="isLoading" />
+
+      <button 
+        (click)="searchWeather()" 
+        [disabled]="isLoading || !cityName.trim()">
+        {{ isLoading ? '⏳ Buscando...' : '🌤️ Buscar' }}
+      </button>
+
+      <button 
+        *ngIf="cityName || weatherData" 
+        (click)="clearSearch()" 
+        [disabled]="isLoading">
+        🧹 Limpar
+      </button>
+    </div>
+
+    <!-- Carregando -->
+    <app-loading 
+      [isLoading]="isLoading" 
+      message="Carregando...">
+    </app-loading>
+
+    <!-- Mensagem de erro -->
+    <div *ngIf="errorMessage && !isLoading" class="error-message">
+      <span>❌ {{ errorMessage }}</span>
+    </div>
+
+    <!-- Resultado -->
+    <div *ngIf="weatherData && !isLoading && !errorMessage" class="result ">
+      <h2> 🏙️ {{ weatherData.resolvedAddress }}</h2>
+
+      <div class="days">
+        <div *ngFor="let day of weatherData.days" class="day">
+          <h3>{{ getDayOfWeek(day.datetime) }}</h3>
+          <p>{{ formatDate(day.datetime) }}</p>
+
+          <div class="big-icon">
+            {{ getWeatherIcon(day.icon) }}
+          </div>
+
+          <p><strong>Máx:</strong> {{ day.tempmax }}°C</p>
+          <p><strong>Mín:</strong> {{ day.tempmin }}°C</p>
+          <p><strong>Média:</strong> {{ day.temp }}°C</p>
+
+          <p>{{ day.conditions }}</p>
+          <p *ngIf="day.description">{{ day.description }}</p>
+
+          <p *ngIf="day.humidity">💧 Umidade: {{ day.humidity }}%</p>
+          <p *ngIf="day.windspeed">💨 Vento: {{ day.windspeed }} km/h</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
